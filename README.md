@@ -1,9 +1,56 @@
 # NgagiAPP
 
-A cross-platform native mobile app built with [NativeScript](https://nativescript.org/) and [Angular](https://angular.dev/).
+This repository is a **mobile app for managing a cotisation** — a group contribution / rotating savings club
+(tontine). It is built for the organiser and the members of a contribution group: it tracks who belongs to the
+group, over what period the contributions run, how much each participant owes, and according to what plan the
+cycle is held.
 
-Generated from the official NativeScript Angular template (`ns create NgagiAPP --ng`), so it ships with the
-modern defaults: standalone Angular components, signals, zoneless change detection, Tailwind CSS, and TypeScript.
+Under the hood, it is a cross-platform native mobile app built with [NativeScript](https://nativescript.org/) and
+[Angular](https://angular.dev/), generated from the official NativeScript Angular template
+(`ns create NgagiAPP --ng`), so it ships with standalone Angular components, signals, zoneless change detection,
+Tailwind CSS, and TypeScript.
+
+## What the app has to be able to do
+
+| # | Capability | Description |
+|---|---|---|
+| 1 | **Register members** | Create and maintain the participants of the group: identity, contact details, and their standing in the cycle. |
+| 2 | **Define the cotisation period** | Set the **start date** and **end date** of the cotisation, so the cycle has a clear opening and closing. |
+| 3 | **Prepare the plan** | Define how the cotisation will be held — the schedule/cadence of the meetings, the order in which members are served, and what happens at each session. |
+| 4 | **Define the amount per participant** | Set the contribution amount each member pays (a uniform amount, or a per-member amount where it differs), and the frequency it applies to. |
+
+## Domain model (planned)
+
+The four capabilities above map onto a small set of entities. These are **documentation of intent only** — the
+classes are not implemented yet.
+
+```
+Cotisation ──┬── period: { startDate: Date, endDate: Date }
+             ├── plan: how the cycle is held (cadence, order, session steps)
+             ├── amountPerParticipant: number | per-member override
+             └── members: Member[]  ← registration lives here
+```
+
+| Entity | Holds |
+|---|---|
+| `Member` | A registered participant of the group. |
+| `Cotisation` | A single cycle: its period, its amount, and its enrolled members. |
+| `Plan` | The arrangement for holding the cycle — meeting schedule, rotation order, session rules. |
+| `Contribution` | A payment recorded against a member for a given period (needed to report who has paid). |
+
+## Roadmap
+
+- [x] Project scaffold (NativeScript + Angular + Tailwind)
+- [ ] Domain model for `Member`, `Cotisation`, `Plan`, `Contribution`
+- [ ] Member registration screens (list / add / edit)
+- [ ] Cotisation setup: period start → end, amount per participant
+- [ ] Plan builder: cadence and order in which the cycle is held
+- [ ] Contribution tracking per member per period
+- [ ] Persistence (local first, sync later — decision open)
+
+> **Awaiting input:** the screen/UI templates for the flows above will be supplied by the project owner in a
+> later prompt, and will drive the layout and field list of the screens. Until they arrive, no domain code is
+> written and the app still boots the starter template's sample screens.
 
 ## Stack
 
@@ -50,7 +97,7 @@ npm shortcuts are also available: `npm run start.android`, `npm run start.ios`,
 │   └── app/
 │       ├── app.component.ts|html   # root component hosting <page-router-outlet>
 │       ├── app.routes.ts           # route definitions
-│       └── people/                 # starter feature: list + detail screens
+│       └── people/                 # template sample — to be replaced by the cotisation screens
 ├── tailwind.config.js
 ├── tsconfig.json
 └── webpack.config.js
@@ -58,8 +105,9 @@ npm shortcuts are also available: `npm run start.android`, `npm run start.ios`,
 
 ## Notes
 
-- `src/app/people/` is the sample feature that comes with the template (a "Computer Scientists" list/detail
-  flow). Use it as a reference, then replace it with your own screens.
+- `src/app/people/` is **not** part of the cotisation app — it is the throwaway sample that ships with the
+  NativeScript template (a "Computer Scientists" list/detail flow). It stays only as a reference for how routing,
+  signals, and services are wired in this project, and will be deleted when the cotisation screens land.
 - Styles: Tailwind utilities work directly on NativeScript UI elements (`class="text-lg p-4"`), and
   `@nativescript/tailwind` translates them into platform styling. Dark mode follows the `.ns-dark` class.
 - `platforms/`, `node_modules/`, and generated `hooks/` are gitignored — never commit them.
