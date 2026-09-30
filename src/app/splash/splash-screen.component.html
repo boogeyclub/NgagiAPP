@@ -1,0 +1,13 @@
+<GridLayout rows="*,auto" class="splash" (tap)="dismiss()">
+  <StackLayout row="0" #brand class="splash-brand">
+    <Image src="~/assets/logo-mark.png" stretch="uniform" class="splash-logo"></Image>
+    <Label text="Ngagi" class="splash-title"></Label>
+    <Label [text]="tagline" class="splash-tagline" textWrap="true"></Label>
+    <ActivityIndicator busy="true" color="#F0B429" class="splash-loader"></ActivityIndicator>
+  </StackLayout>
+
+  <StackLayout row="1" #footer class="splash-footer">
+    <Label [text]="versionLabel" class="splash-version"></Label>
+    <Label [text]="skipHint" class="splash-hint"></Label>
+  </StackLayout>
+</GridLayout>

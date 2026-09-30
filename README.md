@@ -41,6 +41,7 @@ Cotisation ──┬── period: { startDate: Date, endDate: Date }
 ## Roadmap
 
 - [x] Project scaffold (NativeScript + Angular + Tailwind)
+- [x] Splash screen as the first screen (native launch art + in-app splash route)
 - [ ] Domain model for `Member`, `Cotisation`, `Plan`, `Contribution`
 - [ ] Member registration screens (list / add / edit)
 - [ ] Cotisation setup: period start → end, amount per participant
@@ -94,14 +95,46 @@ npm shortcuts are also available: `npm run start.android`, `npm run start.ios`,
 │   ├── app.css             # global styles + Tailwind entry points
 │   ├── main.ts             # app bootstrap (http + router + zoneless providers)
 │   ├── polyfills.ts        # NativeScript globals / Angular polyfills
+│   ├── assets/             # images bundled into the app (logo mark)
 │   └── app/
 │       ├── app.component.ts|html   # root component hosting <page-router-outlet>
-│       ├── app.routes.ts           # route definitions
+│       ├── app.routes.ts           # route definitions (splash is the entry route)
+│       ├── core/app-info.ts        # app version + build number from the native package
+│       ├── splash/                 # splash screen shown on launch
 │       └── people/                 # template sample — to be replaced by the cotisation screens
 ├── tailwind.config.js
 ├── tsconfig.json
 └── webpack.config.js
 ```
+
+## Splash screen & branding
+
+Launching the app shows one continuous branded splash: the **native** launch screen first (before the JS
+runtime is up), then the **in-app** splash route, which fades out into the first real screen.
+
+| Layer | Where |
+|---|---|
+| Native launch (Android) | `App_Resources/Android/src/main/res/drawable-<dpi>/background.png` + `logo.png`, composed by `drawable-nodpi/splash_screen.xml` |
+| Native launch (iOS) | `App_Resources/iOS/Assets.xcassets/LaunchScreen.AspectFill.imageset` + `LaunchScreen.Center.imageset`, laid out by `LaunchScreen.storyboard` |
+| In-app splash | `src/app/splash/splash-screen.component.*`, routed first via `src/app/app.routes.ts` |
+
+Brand palette — keep these in sync across the three layers above:
+
+| Token | Value | Used by |
+|---|---|---|
+| Deep green | `#0C3B2E` | splash background (native launch art + `.splash` in the component CSS) |
+| Gold | `#F0B429` | monogram tile, `ActivityIndicator` |
+| Mint (on dark) | `#A8CFC1` | tagline text |
+
+Behaviour: the splash holds for a minimum of `SPLASH_MIN_MS` (1.8s), tapping it skips ahead, and it navigates
+with `clearHistory` so the back button can never return to it. The version stamp in its footer
+(`v1.0.0 (1)`) is read from the installed package, so it cannot drift: bump `versionName`/`versionCode` in
+`App_Resources/Android/app.gradle` and `CFBundleShortVersionString`/`CFBundleVersion` in
+`App_Resources/iOS/Info.plist`.
+
+The launch art and `src/assets/logo-mark.png` are generated placeholders for the "Ngagi" monogram. The
+**launcher icons are still the NativeScript defaults** (`App_Resources/.../mipmap-*`, `AppIcon.appiconset`,
+`ic_launcher_foreground.xml`) — swap those before shipping.
 
 ## Notes
 
